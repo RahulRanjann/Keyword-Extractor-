@@ -4,7 +4,7 @@ import json
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 
-def sync_get_adsense_data(dateStart,dateEnd,channelName, bearerToken):
+def sync_get_adsense_data(dateStart,dateEnd,channelName,viewMode, bearerToken):
     url = "https://adsense.revcompass.in/get_adsense_data"
     print(f"Fetching AdSense data from {dateStart} to {dateEnd} for channel: {channelName}")
 
@@ -17,7 +17,7 @@ def sync_get_adsense_data(dateStart,dateEnd,channelName, bearerToken):
                 "All Countries"
             ],
             "channelName": channelName,
-            "geodata": False,
+            "geodata": viewMode,
             "accountName": "SIP",
             "currencyCode": "INR"
         }
@@ -31,7 +31,7 @@ def sync_get_adsense_data(dateStart,dateEnd,channelName, bearerToken):
     filtered_data = response.json().get('response', {}).get('data', [])
     return filtered_data
 
-async def get_adsense_data(dateStart,dateEnd,channelName):
+async def get_adsense_data(dateStart,dateEnd,channelName, viewMode):
     loop = asyncio.get_event_loop()
     with ThreadPoolExecutor() as pool:
         token = await loop.run_in_executor(pool, login)
@@ -39,11 +39,11 @@ async def get_adsense_data(dateStart,dateEnd,channelName):
         if bool(error):
             raise Exception('Email Or Password is wrong')
     
-        return await loop.run_in_executor(pool, sync_get_adsense_data, dateStart,dateEnd, channelName,  bearerToken)
+        return await loop.run_in_executor(pool, sync_get_adsense_data, dateStart,dateEnd, channelName, viewMode,  bearerToken)
 
-async def ads_earning(dateStart,dateEnd,channelName):
+async def ads_earning(dateStart,dateEnd,channelName, viewMode):
     try: 
-        data = await get_adsense_data(dateStart,dateEnd,channelName)
+        data = await get_adsense_data(dateStart,dateEnd,channelName, viewMode)  
         return data
     except Exception as e:
         return {"error": str(e)}

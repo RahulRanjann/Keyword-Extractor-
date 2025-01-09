@@ -12,8 +12,9 @@ def handle_ads_earning():
         dateEnd = data.get('dateEnd')
         # countryName = data.get('countryName')
         channelName = data.get('channelName')
+        viewMode = data.get('viewMode')
 
-        response = asyncio.run(ads_earning(dateStart,dateEnd,channelName))
+        response = asyncio.run(ads_earning(dateStart,dateEnd,channelName,viewMode))
         
         return jsonify(response), 200
     

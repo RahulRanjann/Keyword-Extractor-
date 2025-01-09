@@ -13,6 +13,9 @@ import {
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { tr } from 'date-fns/locale';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 export default function Profitability() {
     const [formData, setFormData] = useState({
@@ -26,6 +29,7 @@ export default function Profitability() {
     const [adsenseData, setAdsenseData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [view, setView] = useState(true);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -33,6 +37,11 @@ export default function Profitability() {
             ...prev,
             [name]: value,
         }));
+    };
+    
+
+    const handleChange = (event, newAlignment) => {
+        setView(newAlignment);
     };
 
     const handleDateChange = (field, date) => {
@@ -55,9 +64,10 @@ export default function Profitability() {
         setError(null);
         try {
             const payload = {
-                channelName: formData.channelName.length ===1 && formData.channelName[0]==="" ? 'All Channels': formData.channelName ,
+                channelName: formData.channelName.length === 1 && formData.channelName[0] === "" ? 'All Channels' : formData.channelName,
                 dateStart: formData.dateStart.toISOString().split('T')[0],
                 dateEnd: formData.dateEnd.toISOString().split('T')[0],
+                viewMode: view
             };
 
             console.log('Payload being sent to API:', payload);
@@ -67,7 +77,7 @@ export default function Profitability() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify( payload ),
+                body: JSON.stringify(payload),
             });
 
             if (!response.ok) {
@@ -78,7 +88,7 @@ export default function Profitability() {
             console.log('API Response:', data);
             setAdsenseData(data);
 
-            
+
         } catch (err) {
             console.error('Error fetching data:', err);
             setError(`Failed to fetch AdSense data: ${err.message}`);
@@ -124,6 +134,16 @@ export default function Profitability() {
                             variant="outlined"
                             fullWidth
                         />
+                        <ToggleButtonGroup
+                            color="primary"
+                            value={view}
+                            exclusive
+                            onChange={handleChange}
+                            aria-label="Platform"
+                        >
+                            <ToggleButton value={false}>Regular</ToggleButton>
+                            <ToggleButton value={true}>Geowise</ToggleButton>
+                        </ToggleButtonGroup>
                     </div>
 
                     <Button
@@ -148,6 +168,7 @@ export default function Profitability() {
                                     <TableRow>
                                         <TableCell>Date</TableCell>
                                         <TableCell>Channel Name</TableCell>
+                                        <TableCell>Country Name</TableCell>
                                         {/* <TableCell>Channel ID</TableCell> */}
                                         <TableCell>Estimated Earnings (INR)</TableCell>
                                         {/* <TableCell>Page Views</TableCell> */}
@@ -162,6 +183,7 @@ export default function Profitability() {
                                         <TableRow key={index}>
                                             <TableCell>{item.date ?? 'N/A'}</TableCell>
                                             <TableCell>{item.channelName ?? 'N/A'}</TableCell>
+                                            <TableCell>{item.countryName ?? 'N/A'}</TableCell>
                                             {/* <TableCell>{item.channelId ?? 'N/A'}</TableCell> */}
                                             <TableCell>{item.rev ?? 'N/A'}</TableCell>
                                             {/* <TableCell>{item.pv ?? 'N/A'}</TableCell> */}

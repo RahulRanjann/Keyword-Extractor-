@@ -18,7 +18,7 @@ def handle_keyword_extraction():
         if not url:
             return jsonify({"error": "URL is required in the POST body"}), 400
         
-        keywords = extract_keywords(url)
+        keywords = extract_keywords()
         return jsonify({"keywords": keywords}), 200
     
     except Exception as e:
